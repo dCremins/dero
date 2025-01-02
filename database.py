@@ -38,9 +38,9 @@ class DatabaseCommands:
     @classmethod
     def validate_user(self, username:str, password:str) -> bool:
         cursor = self.db.cursor()
-        result:tuple[str, bytes] = cursor.execute("SELECT password, salt FROM users WHERE username='?'",(username)).fetchone()
+        result = cursor.execute("SELECT password, salt, name FROM users WHERE username=?",(username,)).fetchone()
         if(result is None):
             return False
         else:
-            user_password, salt = result
-            return self.hash_password(password, salt) == user_password
+            user_password, salt, name = result
+            return name if self.hash_password(password, salt) == user_password else False
